@@ -10,7 +10,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/license-free%20to%20use-brightgreen" alt="License">
+  <a href="https://philippweidlich.github.io/LocalArc/localarc.html"><img src="https://img.shields.io/badge/LIVE%20DEMO-Try%20it%20now-e63946?style=for-the-badge" alt="Live Demo"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-brightgreen" alt="License">
   <img src="https://img.shields.io/badge/size-135%20KB-blue" alt="Size">
   <img src="https://img.shields.io/badge/dependencies-zero-orange" alt="Dependencies">
   <img src="https://img.shields.io/badge/backend-none-critical" alt="No Backend">
@@ -21,6 +25,8 @@
 ## What is LocalArc?
 
 LocalArc is a **complete media center** packed into a single `localarc.html` file. Drop in your local videos, audio files, or YouTube links — and you have a beautiful, fully-featured player with playlists, live streams, and more. Everything runs **100% in your browser**, nothing is uploaded anywhere.
+
+> **[Try the Live Demo](https://philippweidlich.github.io/LocalArc/localarc.html)**
 
 ---
 
@@ -116,13 +122,19 @@ LocalArc is a **complete media center** packed into a single `localarc.html` fil
 
 That's it. No install. No server. No config.
 
+Or just **[try the live demo](https://philippweidlich.github.io/LocalArc/localarc.html)** right in your browser.
+
+---
+
+## About This Project
+
+This is a personal side project. I'm an apprentice IT specialist (Fachinformatiker Systemintegration) and developed this iteratively with the help of AI coding assistants (Claude). The architecture, feature decisions, design direction, and testing were all driven by me; the AI helped me write and refine the code faster than I could have alone. I'm sharing this openly because I believe in transparent AI-assisted development — the result is real, it works, and it's yours to use, fork, and improve.
+
 ---
 
 ## License
 
-**Free to use for personal and non-commercial purposes.**
-
-You may **not** use this project or any part of it for commercial purposes without explicit written permission from the author. See [LICENSE](LICENSE) for details.
+This project is licensed under the [MIT License](LICENSE) — free to use, modify, and distribute.
 
 ---
 
