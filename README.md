@@ -49,7 +49,7 @@ Months of daily use led to a big update. Highlights:
 
 ## Screenshots
 
-| Playlist View | Cinema Mode — sidebar hidden |
+| Playlist View | Cinema Mode (21:9) — sidebar hidden |
 |:---:|:---:|
 | ![Playlist](screenshots/localarc-playlist.jpg) | ![Playing](screenshots/localarc-playing.jpg) |
 
