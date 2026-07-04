@@ -27,6 +27,8 @@
 LocalArc is a **complete media center** packed into a single `localarc.html` file. Drop in your local videos, audio files, or YouTube links — and you have a beautiful, fully-featured player with playlists, live streams, and more. Everything runs **100% in your browser**, nothing is uploaded anywhere.
 
 > **[Try the Live Demo](https://philippweidlich.github.io/LocalArc/localarc.html)**
+>
+> ⚠️ The live demo may still show an **older version** — GitHub Pages sometimes lags behind the latest release. Downloading `localarc.html` from this repo always gets you the newest version.
 
 ---
 
