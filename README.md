@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="screenshots/localarc-playing.jpg" alt="LocalArc Player" width="800">
+  <img src="screenshots/localarc-playlist.jpg" alt="LocalArc Player" width="800">
 </p>
 
 <h1 align="center">LocalArc</h1>
