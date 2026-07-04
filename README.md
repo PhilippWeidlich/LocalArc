@@ -15,7 +15,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-brightgreen" alt="License">
-  <img src="https://img.shields.io/badge/size-135%20KB-blue" alt="Size">
+  <img src="https://img.shields.io/badge/size-179%20KB-blue" alt="Size">
   <img src="https://img.shields.io/badge/dependencies-zero-orange" alt="Dependencies">
   <img src="https://img.shields.io/badge/backend-none-critical" alt="No Backend">
 </p>
@@ -30,11 +30,30 @@ LocalArc is a **complete media center** packed into a single `localarc.html` fil
 
 ---
 
+## What's New — July 2026 Update
+
+Months of daily use led to a big update. Highlights:
+
+- **Folder sync** — drop new videos into your linked folder, reload, and they appear in the playlist automatically; videos you deleted stay deleted
+- **Volume boost** — up to 300% via Web Audio
+- **Sleep timer** — 15/30/60/90 minutes or "after this video"
+- **Remappable keyboard shortcuts** — reassign every key in the `?` overlay, with one-click reset
+- **Full keyboard control** — navigate playlists, switch tabs, and start videos without touching the mouse
+- **Playlist crossover** — playback flows seamlessly from the end of one playlist into the next
+- **Hover title overlay** — YouTube-style video title on hover, also in fullscreen
+- **Collapsible playlist sidebar** and a persistent **time-spent counter**
+- **Fullscreen upgrades** — toasts and the video stats panel now stay visible in fullscreen
+- **Silent-audio warning** for MKV files with AC3/DTS tracks, **reduced-motion support**, and many small fixes
+
+---
+
 ## Screenshots
 
 | Playlist View | Video Playing |
 |:---:|:---:|
 | ![Playlist](screenshots/localarc-playlist.jpg) | ![Playing](screenshots/localarc-playing.jpg) |
+
+> **Heads up:** These screenshots show an older version — the current release looks even better and does a lot more. New screenshots are coming… eventually. 😅
 
 ---
 
@@ -50,7 +69,11 @@ LocalArc is a **complete media center** packed into a single `localarc.html` fil
 - **Video size modes** — 100%, 75%, 50%, 25% scaling
 - **Fullscreen mode** — with auto-hiding controls
 - **Center play/pause overlay** — large, clickable play button on the video
-- **Volume control** — slider + mute toggle
+- **Volume control** — slider + mute toggle, fine-tune in 2% steps with `↑`/`↓`
+- **Volume boost** — amplify quiet videos up to 300% (Web Audio powered)
+- **Sleep timer** — stop playback after 15/30/60/90 minutes or after the current video
+- **Hover title overlay** — YouTube-style title bar when hovering the video, works in fullscreen too
+- **Silent-audio warning** — detects MKV files with undecodable audio (AC3/DTS) and shows a hint instead of playing silently
 - **Autoplay** — automatically plays the next item in the playlist
 - **Shuffle & Repeat** — randomize playback or loop the playlist
 - **Video statistics** — real-time stats overlay (resolution, codec, bitrate, etc.)
@@ -69,7 +92,11 @@ LocalArc is a **complete media center** packed into a single `localarc.html` fil
 - **Resume progress bars** — see how far you've watched each video at a glance
 - **Bulk YouTube/URL import** — paste multiple links at once
 - **Relink offline files** — re-attach local files after browser restart
+- **Folder sync** — drop new videos into your linked folder, hit reload, and they're added to the playlist automatically — while videos you deleted stay deleted (per-playlist ignore list)
 - **Collapsible sections** — collapse/expand playlists to save space
+- **Collapsible sidebar** — hide the entire playlist panel with one click or the `P` key
+- **Keyboard navigation** — focus playlists with `Alt+↑/↓`, switch tabs with `Alt+←/→`, play with `Enter`
+- **Playlist crossover** — at the end of a playlist, "Next" continues with the first video of the next playlist
 
 ### Live Streams
 - **Live source manager** — add, edit, and delete live stream sources
@@ -79,7 +106,11 @@ LocalArc is a **complete media center** packed into a single `localarc.html` fil
 - **Search sources** — filter your live streams by name
 
 ### UI & Design
-- **Dark & Light mode** — toggle with one click, preference is saved
+- **Dark & Light mode** — toggle with one click (or the `D` key), preference is saved
+- **Remappable shortcuts** — every keyboard shortcut can be reassigned in the `?` overlay, with reset to defaults
+- **Time-spent counter** — the header tracks how much time you've spent in the player (persistent)
+- **Fullscreen-proof feedback** — toast notifications and the stats panel stay visible in fullscreen
+- **Reduced motion support** — respects the system "reduce motion" accessibility setting
 - **Responsive layout** — works on desktop and mobile
 - **Toast notifications** — elegant feedback for every action
 - **Keyboard shortcuts overlay** — press `?` to see all shortcuts
@@ -98,15 +129,29 @@ LocalArc is a **complete media center** packed into a single `localarc.html` fil
 | `Shift + Arrow Left` | Skip -15 seconds |
 | `Shift + Arrow Up` | Speed up |
 | `Shift + Arrow Down` | Speed down |
+| `Arrow Up` / `Arrow Down` | Volume up / down (2% steps) |
 | `F` | Toggle fullscreen |
 | `M` | Toggle mute |
+| `A` | Toggle autoplay |
+| `S` | Toggle video stats |
+| `V` | Cycle video size (100 → 75 → 50 → 25%) |
+| `R` | Cycle repeat mode |
+| `Z` | Toggle shuffle |
+| `P` | Toggle playlist sidebar |
+| `D` | Toggle dark / light mode |
+| `X` `X` | Delete current video (press twice to confirm) |
+| `Alt + Arrow Up/Down` | Focus previous / next playlist |
+| `Alt + Arrow Left/Right` | Switch playlist tab |
+| `Enter` | Play focused playlist |
 | `?` | Show shortcuts overlay |
 | `1`–`9` | Select live source (in Live mode) |
 | `Escape` | Close modals / overlays |
 
+> **Every shortcut is remappable** — press `?`, click a key, and assign your own. Reset to defaults anytime.
+
 ### Technical
 - **Single HTML file** — no build step, no bundling, no dependencies
-- **135 KB total** — incredibly lightweight
+- **~179 KB total** — still incredibly lightweight
 - **100% client-side** — all data stays in your browser (localStorage)
 - **Zero dependencies** — no frameworks, no libraries, pure vanilla JS + CSS
 - **Touch-friendly** — full touch support for mobile devices
