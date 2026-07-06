@@ -15,7 +15,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-brightgreen" alt="License">
-  <img src="https://img.shields.io/badge/size-179%20KB-blue" alt="Size">
+  <img src="https://img.shields.io/badge/size-228%20KB-blue" alt="Size">
   <img src="https://img.shields.io/badge/dependencies-zero-orange" alt="Dependencies">
   <img src="https://img.shields.io/badge/backend-none-critical" alt="No Backend">
 </p>
@@ -30,20 +30,38 @@ LocalArc is a **complete media center** packed into a single `localarc.html` fil
 
 ---
 
-## What's New — July 2026 Update
+## What's New — v3.0
 
-Months of daily use led to a big update. Highlights:
+The biggest update yet. Highlights:
+
+- **Cinema player design (new default)** — the controls now float transparently *over* the video, so the picture gets the full frame: thin seekbar on top, `0:00 / 1:06:16` time display, and an in-player ⚙ submenu for size, stats, speed, boost & sleep. The classic bar below the video is still there as a one-click fallback
+- **Settings hub** — the header gear (or `?`) opens a wide two-column panel: every option on the left, every keyboard shortcut (fully remappable) on the right
+- **HOLD control lock** — like the hold switch on an old walkman: freezes every button, the seekbar and all shortcuts against accidental presses. Unlock only by holding the button or `H` for one second — works in fullscreen too
+- **Customizable control bar** — show or hide every single button (except play), and build the player the way *you* want
+- **Delete from disk** — hold a playlist item for 3 seconds to permanently delete the actual file from your folder (File System Access API, asks for write permission once — no recycle bin, so the red fill-up is deliberate)
+- **Quality badge** — SD / HD / Full HD / 1440p / 4K plus aspect ratio next to the volume control; width-aware, so 2560×1280 correctly counts as 1440p
+- **Frame-drop status LED** (opt-in nerd feature) — live playback health from green over yellow/orange to red
+- **Long-video time fix** — durations now show hours (`1:17:26` instead of `77:26`); click the duration to switch to a remaining-time countdown
+- **Live-preview sliders** — video title size and 15-second-button size, previewed directly on the video while dragging
+- **Page & playlist width sliders**, **playlist side switch** (sidebar left/right, `L` key)
+- **Redesigned skip icons** (crisp filled style), rectangle cinema-mode button that fills when active, diagonal-arrow fullscreen icon, steady live dot (no more blinking)
+- **Click-to-copy video title**, light-mode support for the classic control bar, and a refreshed dark look: glass header, subtle color ambience, gradient accents, better scrollbars
+
+<details>
+<summary><strong>Previous update — v2.0 (July 2026)</strong></summary>
 
 - **Folder sync** — drop new videos into your linked folder, reload, and they appear in the playlist automatically; videos you deleted stay deleted
 - **Volume boost** — up to 300% via Web Audio
 - **Sleep timer** — 15/30/60/90 minutes or "after this video"
-- **Remappable keyboard shortcuts** — reassign every key in the `?` overlay, with one-click reset
+- **Remappable keyboard shortcuts** — reassign every key, with one-click reset
 - **Full keyboard control** — navigate playlists, switch tabs, and start videos without touching the mouse
 - **Playlist crossover** — playback flows seamlessly from the end of one playlist into the next
-- **Hover title overlay** — YouTube-style video title on hover, also in fullscreen
+- **Hover title overlay** — video title on hover, also in fullscreen
 - **Collapsible playlist sidebar** and a persistent **time-spent counter**
 - **Fullscreen upgrades** — toasts and the video stats panel now stay visible in fullscreen
 - **Silent-audio warning** for MKV files with AC3/DTS tracks, **reduced-motion support**, and many small fixes
+
+</details>
 
 ---
 
@@ -70,7 +88,11 @@ Months of daily use led to a big update. Highlights:
 - **Volume control** — slider + mute toggle, fine-tune in 2% steps with `↑`/`↓`
 - **Volume boost** — amplify quiet videos up to 300% (Web Audio powered)
 - **Sleep timer** — stop playback after 15/30/60/90 minutes or after the current video
-- **Hover title overlay** — YouTube-style title bar when hovering the video, works in fullscreen too
+- **HOLD control lock** — freeze all buttons, the seekbar and every shortcut against accidental presses; unlock by holding the button or `H` for 1 second
+- **Quality badge** — SD / HD / Full HD / 1440p / 4K + aspect ratio of the running video, width-aware classification
+- **Frame-drop status LED** (opt-in) — live playback health indicator from green to red
+- **Remaining-time countdown** — click the duration to toggle between total and remaining time; hours display correctly on long videos
+- **Hover title overlay** — title bar when hovering the video, works in fullscreen too; click the title to copy it
 - **Silent-audio warning** — detects MKV files with undecodable audio (AC3/DTS) and shows a hint instead of playing silently
 - **Autoplay** — automatically plays the next item in the playlist
 - **Shuffle & Repeat** — randomize playback or loop the playlist
@@ -91,6 +113,8 @@ Months of daily use led to a big update. Highlights:
 - **Bulk YouTube/URL import** — paste multiple links at once
 - **Relink offline files** — re-attach local files after browser restart
 - **Folder sync** — drop new videos into your linked folder, hit reload, and they're added to the playlist automatically — while videos you deleted stay deleted (per-playlist ignore list)
+- **Delete from disk** — hold a playlist item for 3 seconds (red fill-up as confirmation) to permanently delete the real file via the File System Access API; asks for write permission once
+- **Playlist side switch** — move the whole sidebar to the left or right (`L` key or settings)
 - **Collapsible sections** — collapse/expand playlists to save space
 - **Collapsible sidebar** — hide the entire playlist panel with one click or the `P` key
 - **Keyboard navigation** — focus playlists with `Alt+↑/↓`, switch tabs with `Alt+←/→`, play with `Enter`
@@ -104,8 +128,12 @@ Months of daily use led to a big update. Highlights:
 - **Search sources** — filter your live streams by name
 
 ### UI & Design
-- **Dark & Light mode** — toggle with one click (or the `D` key), preference is saved
-- **Remappable shortcuts** — every keyboard shortcut can be reassigned in the `?` overlay, with reset to defaults
+- **Two player designs** — transparent cinema controls floating over the video (default, full-frame picture) or the classic bar below it; switchable anytime
+- **Settings hub** — gear icon or `?`: title size, skip-button size, page & playlist width, playlist side, design, badges — everything with live preview, saved automatically
+- **Customizable control bar** — every button can be shown or hidden individually (except play)
+- **In-player ⚙ submenu** — size modes, stats, speed, boost and sleep timer tucked into a tidy popup in cinema design
+- **Dark & Light mode** — toggle with one click (or the `D` key), preference is saved; the classic control bar follows the light theme too
+- **Remappable shortcuts** — every keyboard shortcut can be reassigned in the settings panel (`?`), with reset to defaults
 - **Time-spent counter** — the header tracks how much time you've spent in the player (persistent)
 - **Fullscreen-proof feedback** — toast notifications and the stats panel stay visible in fullscreen
 - **Reduced motion support** — respects the system "reduce motion" accessibility setting
@@ -136,12 +164,14 @@ Months of daily use led to a big update. Highlights:
 | `R` | Cycle repeat mode |
 | `Z` | Toggle shuffle |
 | `P` | Toggle playlist sidebar |
+| `L` | Switch playlist sidebar side (left/right) |
+| `H` | Lock controls (HOLD) — hold 1 second to unlock |
 | `D` | Toggle dark / light mode |
 | `X` `X` | Delete current video (press twice to confirm) |
 | `Alt + Arrow Up/Down` | Focus previous / next playlist |
 | `Alt + Arrow Left/Right` | Switch playlist tab |
 | `Enter` | Play focused playlist |
-| `?` | Show shortcuts overlay |
+| `?` | Open settings & shortcuts |
 | `1`–`9` | Select live source (in Live mode) |
 | `Escape` | Close modals / overlays |
 
@@ -149,7 +179,7 @@ Months of daily use led to a big update. Highlights:
 
 ### Technical
 - **Single HTML file** — no build step, no bundling, no dependencies
-- **~179 KB total** — still incredibly lightweight
+- **~228 KB total** — still incredibly lightweight
 - **100% client-side** — all data stays in your browser (localStorage)
 - **Zero dependencies** — no frameworks, no libraries, pure vanilla JS + CSS
 - **Touch-friendly** — full touch support for mobile devices

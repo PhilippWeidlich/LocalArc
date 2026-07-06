@@ -14,6 +14,7 @@
       --accent:#e63946; --blue:#38bdf8; --green:#2ecc71; --yellow:#fbbf24; --purple:#a78bfa;
       --text:#f0f0f5; --text-sub:#9999b0; --text-muted:#55556a;
       --hh:62px; --pw:310px;
+      --vt-size:21px; --skip-ico:48px;
       color-scheme:dark;
     }
     body.light {
@@ -47,8 +48,7 @@
     .mtab:hover{color:var(--text)}
     .mtab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 6px rgba(0,0,0,.3)}
     .mtab.live.active{color:var(--accent)}
-    .live-dot-sm{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1.1s infinite;box-shadow:0 0 6px rgba(230,57,70,.7)}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+    .live-dot-sm{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(230,57,70,.7)}
 
     .h-center{flex:1;min-width:0;display:flex;align-items:center;justify-content:center}
     .h-label{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:340px}
@@ -85,12 +85,13 @@
     .skip-zone:hover{opacity:1}
     .skip-zone.left{left:0;background:linear-gradient(90deg,rgba(0,0,0,.28),transparent)}
     .skip-zone.right{right:0;background:linear-gradient(270deg,rgba(0,0,0,.28),transparent)}
-    .skip-label{display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:11px;font-weight:600;letter-spacing:.5px}
-    .skip-label svg{width:28px;height:28px;opacity:.9}
-    .skip-flash{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0}
+    .skip-label{display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:11px;font-weight:600;letter-spacing:.5px;position:relative;z-index:1}
+    .skip-label svg{width:var(--skip-ico,48px);height:var(--skip-ico,48px);opacity:.95;filter:drop-shadow(0 2px 8px rgba(0,0,0,.55))}
+    .skip-flash{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;z-index:0}
     .skip-flash.show{animation:flashFade .55s ease forwards}
     @keyframes flashFade{0%{opacity:1}100%{opacity:0}}
-    .skip-flash-inner{background:rgba(255,255,255,.15);border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:22px}
+    /* Blitz-Kreis liegt HINTER dem Pfeil-Symbol, läuft komplett weich aus — keine sichtbare Kante */
+    .skip-flash-inner{background:radial-gradient(circle,rgba(255,255,255,.3),rgba(255,255,255,0) 70%);border-radius:50%;width:calc(var(--skip-ico,48px)*2);height:calc(var(--skip-ico,48px)*2)}
 
     /* ── MODERN CONTROLS BAR ── */
     .ctrl-bar.show{display:flex}
@@ -399,8 +400,9 @@
     @media(max-width:700px){
       body.pl-collapsed .main{grid-template-columns:1fr;grid-template-rows:1fr 0}
     }
-    #togglePlBtn svg{transition:transform .25s ease}
-    body.pl-collapsed #togglePlBtn svg{transform:rotate(180deg)}
+    /* 21:9-Knopf: Rechteck füllt sich, solange der Kinomodus (Playlist ausgeblendet) aktiv ist */
+    #togglePlBtn svg rect{fill:transparent;transition:fill .25s ease}
+    body.pl-collapsed #togglePlBtn svg rect{fill:currentColor}
 
     /* ══ SEITENZEIT-TIMER (added) ══ */
     .page-timer{display:flex;align-items:center;gap:6px;height:32px;padding:0 11px;border-radius:9px;
@@ -419,9 +421,12 @@
       pointer-events:none;opacity:0;transform:translateY(-8px);
       transition:opacity .25s ease,transform .25s ease}
     .video-title-bar.show{opacity:1;transform:none}
-    .vt-text{display:block;max-width:90%;font-family:'DM Sans',sans-serif;font-size:21px;font-weight:600;
+    .vt-text{display:inline-block;max-width:90%;font-family:'DM Sans',sans-serif;font-size:var(--vt-size,21px);font-weight:600;
       color:#fff;text-shadow:0 1px 5px rgba(0,0,0,.7);letter-spacing:.2px;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      cursor:copy;user-select:text}
+    /* Titel nur anklickbar/kopierbar, wenn er auch sichtbar ist */
+    .video-title-bar.show .vt-text{pointer-events:auto}
 
     /* ══ REDUCED MOTION (added) ══ */
     /* Respektiert die System-Einstellung „Bewegung reduzieren" – Animationen/Übergänge
@@ -434,6 +439,215 @@
         scroll-behavior:auto !important;
       }
     }
+
+    /* ══ EINSTELLUNGEN + NEUE BEDIENELEMENTE (added) ══ */
+    /* — größere 15-Sek-Buttons in der Steuerleiste — */
+    #cskipback,#cskipfwd{width:44px;height:44px}
+    #cskipback svg,#cskipfwd svg{width:26px;height:26px}
+    /* — Vollbild-Knopf mit Rechteck-Icon — */
+    #cfsBtn{display:flex;align-items:center;justify-content:center}
+    /* — Zeit unten rechts: klickbar für Restzeit-Modus — */
+    #tDur{cursor:pointer;text-align:right}
+    #tDur:hover{color:rgba(255,255,255,.85)}
+    /* — Qualitäts-Emblem (SD / HD / Full HD / 1440p / 4K) — */
+    .qual-badge{height:26px;display:flex;align-items:center;padding:0 9px;border-radius:6px;border:1px solid transparent;
+      font-family:'DM Sans',sans-serif;font-size:10px;font-weight:800;letter-spacing:.5px;
+      white-space:nowrap;flex-shrink:0;user-select:none;cursor:default}
+    .qual-badge.q-sd {color:#9999b0;border-color:rgba(153,153,176,.35);background:rgba(153,153,176,.08)}
+    .qual-badge.q-hd {color:#38bdf8;border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.08)}
+    .qual-badge.q-fhd{color:#2ecc71;border-color:rgba(46,204,113,.35);background:rgba(46,204,113,.08)}
+    .qual-badge.q-qhd{color:#a78bfa;border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.08)}
+    .qual-badge.q-4k {color:#fbbf24;border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.1)}
+    /* — HOLD: Steuerung sperren — */
+    #holdBtn.locked{border-color:var(--accent);color:var(--accent);background:rgba(230,57,70,.14)}
+    body.ui-locked .ctrl-top > *:not(#holdBtn){pointer-events:none;opacity:.35}
+    body.ui-locked .prog-wrap{pointer-events:none;opacity:.45}
+    body.ui-locked .skip-zone{display:none !important}
+    body.ui-locked .center-play{pointer-events:none !important;opacity:0 !important}
+    body.ui-locked .speed-panel,body.ui-locked .stats-panel{display:none}
+    /* — Playlist-Seite tauschen (links statt rechts) — */
+    body.pl-left .main{grid-template-columns:var(--pw) 1fr}
+    body.pl-left .side{order:-1;border-left:none;border-right:1px solid var(--border)}
+    /* Playlist links + eingeklappt: die .side ist display:none, der Player rückt in Spalte 1 */
+    body.pl-left.pl-collapsed .main{grid-template-columns:1fr 0}
+    @media(max-width:700px){
+      body.pl-left .main{grid-template-columns:1fr}
+      body.pl-left .side{order:0;border-right:none;border-top:1px solid var(--border)}
+    }
+    /* — Skip-Zonen-Vorschau, solange der Slider gezogen wird — */
+    body.skip-preview .skip-zone{opacity:1}
+    /* — Frame-Status-LED (Nerd-Funktion, ⚙ standardmäßig aus) — */
+    .drop-led{width:11px;height:11px;border-radius:50%;flex-shrink:0;align-self:center;margin:0 5px;
+      background:#2ecc71;box-shadow:0 0 9px #2ecc71;transition:background .5s,box-shadow .5s;cursor:help}
+    /* — Menü-Knöpfe ein/ausblenden (Chips im Settings-Modal) — */
+    .menu-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:4px}
+    .menu-chip{height:28px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text-sub);
+      font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:600;cursor:pointer;padding:0 6px;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      transition:background .15s,color .15s,border-color .15s,opacity .15s}
+    .menu-chip:hover{border-color:var(--border2)}
+    .menu-chip.on{border-color:rgba(46,204,113,.45);color:var(--green);background:rgba(46,204,113,.07)}
+    .menu-chip.off{opacity:.5;text-decoration:line-through}
+    /* — Settings-Modal: breites 16:9-Layout, links Einstellungen, rechts Tastenkürzel — */
+    .settings-modal{width:980px;max-width:calc(100vw - 32px);max-height:88vh;overflow-y:auto}
+    .settings-body{display:grid;grid-template-columns:1.05fr 1fr;gap:4px 36px;align-items:start}
+    @media(max-width:920px){.settings-body{grid-template-columns:1fr}}
+    .keys-col-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--text-sub);margin-bottom:10px;display:flex;align-items:baseline;gap:8px}
+    .keys-col-hint{font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.3px;color:var(--text-muted)}
+    .settings-modal input[type=range]{flex:1;width:100%;height:5px}
+    /* — schönere Schalter im Settings-Modal — */
+    .settings-modal .tog{width:44px;height:24px;flex-shrink:0}
+    .settings-modal .tog-sl{background:var(--surface3);border:1px solid var(--border2);transition:background .25s,border-color .25s,box-shadow .25s}
+    .settings-modal .tog-sl::before{width:16px;height:16px;left:3px;top:3px;background:var(--text-muted)}
+    .settings-modal .tog input:checked+.tog-sl{background:var(--accent);border-color:var(--accent);box-shadow:0 0 12px rgba(230,57,70,.45)}
+    .settings-modal .tog input:checked+.tog-sl::before{transform:translateX(20px);background:#fff}
+    .settings-modal .set-toggle-row{gap:11px}
+    .settings-modal .set-toggle-row .modal-hint{flex:1}
+    .set-slider-row{display:flex;align-items:center;gap:9px}
+    .set-reset{width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-size:12px;flex-shrink:0;transition:background .15s,color .15s,border-color .15s}
+    .set-reset:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+    .set-toggle-row{display:flex;align-items:center;gap:8px}
+    .set-side-btn{height:30px;padding:0 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text-sub);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+    .set-side-btn:hover{background:var(--surface3);color:var(--text)}
+    .set-side-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(230,57,70,.12)}
+
+    /* ══ HELL-MODUS FÜR DIE PLAYER-LEISTE (added) ══ */
+    body.light .ctrl-bar{background:linear-gradient(0deg,rgba(250,250,254,.99),rgba(238,237,244,.96));border-top:1px solid rgba(0,0,0,.09)}
+    body.light .cbtn{color:rgba(13,13,24,.6)}
+    body.light .cbtn:hover{background:rgba(0,0,0,.08);color:#0d0d18}
+    body.light .cbtn.active{color:var(--accent)}
+    body.light .cbtn.big{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.22)}
+    body.light .cbtn.big svg{color:#0d0d18}
+    body.light .cbtn.big:hover{background:rgba(0,0,0,.1);border-color:rgba(0,0,0,.4)}
+    body.light .prog-track{background:rgba(0,0,0,.14)}
+    body.light .prog-thumb{background:var(--accent)}
+    body.light .prog-time{color:rgba(13,13,24,.55)}
+    body.light #tDur:hover{color:rgba(13,13,24,.9)}
+    body.light .size-btn,body.light .speed-btn,body.light .stats-btn{border-color:rgba(0,0,0,.18);color:rgba(13,13,24,.55)}
+    body.light .size-btn:hover,body.light .speed-btn:hover,body.light .stats-btn:hover{border-color:rgba(0,0,0,.4);color:rgba(13,13,24,.9)}
+    body.light .size-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(230,57,70,.1)}
+    body.light .auto-row{color:rgba(13,13,24,.55)}
+    body.light .ctrl-bar .tog-sl{background:rgba(0,0,0,.18)}
+    body.light .ctrl-bar .tog-sl::before{background:rgba(255,255,255,.95)}
+    body.light .ctrl-bar .tog input:checked+.tog-sl{background:var(--accent)}
+    body.light .speed-panel,body.light .stats-panel{background:rgba(250,250,254,.97);border-color:rgba(0,0,0,.12);box-shadow:0 12px 40px rgba(0,0,0,.25)}
+    body.light .speed-opt{color:rgba(13,13,24,.65)}
+    body.light .speed-opt:hover{background:rgba(0,0,0,.06);color:#0d0d18}
+    body.light .stats-label{color:rgba(13,13,24,.45)}
+    body.light .stats-val{color:rgba(13,13,24,.85)}
+    body.light .stats-sep{background:rgba(0,0,0,.08)}
+    body.light .prog-preview{background:rgba(250,250,254,.97);border-color:rgba(0,0,0,.18);color:#0d0d18}
+
+    /* ══ YOUTUBE-STYLE PLAYER-UI (added) ══ */
+    /* Leiste liegt transparent ÜBER dem Video → das Bild bekommt die volle 16:9-Fläche.
+       Umschaltbar in den Einstellungen: „YouTube" ↔ „Klassisch".                        */
+    #ytTimeBox{display:none}
+    #ytGearBtn{display:none}
+    body.yt-ui #ytTimeBox{display:flex;align-items:center;gap:5px;flex-shrink:0;padding:0 4px;order:7}
+    body.yt-ui #ytGearBtn{display:flex;order:14}
+    body.yt-ui .yt-time-sep{color:rgba(255,255,255,.5);font-size:12px}
+    body.yt-ui .ctrl-bar{position:absolute;left:0;right:0;bottom:0;z-index:50;border-top:none;
+      background:linear-gradient(0deg,rgba(0,0,0,.85),rgba(0,0,0,.4) 60%,transparent);
+      padding:0 10px 8px}
+    /* dünner Fortschrittsbalken oben über die volle Breite */
+    body.yt-ui .prog-wrap{gap:0;padding:8px 2px 4px}
+    body.yt-ui .prog-track{height:4px;border-radius:2px;background:rgba(255,255,255,.25)}
+    body.yt-ui .prog-track:hover,body.yt-ui .prog-track.scrubbing{height:7px;margin:-1.5px 0}
+    body.yt-ui .prog-thumb{background:var(--accent);width:15px;height:15px}
+    body.yt-ui .prog-time{font-size:12.5px;color:rgba(255,255,255,.92);min-width:0}
+    body.yt-ui #tDur{color:rgba(255,255,255,.6)}
+    body.yt-ui #tDur:hover{color:#fff}
+    /* Anordnung wie YouTube: links Transport + Zeit, rechts Extras */
+    body.yt-ui #cplay{order:1}
+    body.yt-ui #cprev{order:2}
+    body.yt-ui #cnext{order:3}
+    body.yt-ui #cskipback{order:4}
+    body.yt-ui #cskipfwd{order:5}
+    body.yt-ui .vol-row{order:6}
+    body.yt-ui .ctrl-sp1{order:8}
+    body.yt-ui .ctrl-sp2{display:none}
+    body.yt-ui #crepeat{order:9}
+    body.yt-ui #cshuffle{order:10}
+    body.yt-ui .qual-badge{order:11}
+    body.yt-ui .drop-led{order:12}
+    body.yt-ui .auto-row{order:13}
+    body.yt-ui #holdBtn{order:15}
+    body.yt-ui #cfsBtn{order:16;border:none;height:34px;width:42px;color:rgba(255,255,255,.8)}
+    body.yt-ui #cfsBtn:hover{background:rgba(255,255,255,.12);color:#fff}
+    body.yt-ui #cfsBtn svg{width:18px;height:18px}
+    /* Play-Knopf schlicht ohne Kreis — wie bei YouTube */
+    body.yt-ui .cbtn.big{width:44px;height:44px;background:transparent;border:none;margin:0;border-radius:9px}
+    body.yt-ui .cbtn.big:hover{background:rgba(255,255,255,.12);transform:none}
+    /* dunkle Overlay-Optik unabhängig vom Hell/Dunkel-Modus (Leiste liegt ja auf dem Video) */
+    body.yt-ui .cbtn{color:rgba(255,255,255,.8)}
+    body.yt-ui .cbtn:hover{background:rgba(255,255,255,.12);color:#fff}
+    body.yt-ui .cbtn.active{color:var(--accent)}
+    body.yt-ui .cbtn.big svg{color:#fff}
+    body.yt-ui .size-btn,body.yt-ui .speed-btn,body.yt-ui .stats-btn{border-color:rgba(255,255,255,.14);color:rgba(255,255,255,.6)}
+    body.yt-ui .size-btn:hover,body.yt-ui .speed-btn:hover,body.yt-ui .stats-btn:hover{border-color:rgba(255,255,255,.35);color:#fff}
+    body.yt-ui .size-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(230,57,70,.12)}
+    body.yt-ui .auto-row{color:rgba(255,255,255,.7)}
+    body.yt-ui .ctrl-bar .tog-sl{background:rgba(255,255,255,.2)}
+    body.yt-ui .ctrl-bar .tog-sl::before{background:rgba(255,255,255,.6)}
+    body.yt-ui .ctrl-bar .tog input:checked+.tog-sl{background:var(--accent)}
+    body.yt-ui .prog-preview{background:rgba(8,8,14,.92);border-color:rgba(255,255,255,.15);color:#fff}
+    body.yt-ui .speed-panel,body.yt-ui .stats-panel{background:rgba(8,8,14,.94);border-color:rgba(255,255,255,.1)}
+    body.yt-ui .speed-opt{color:rgba(255,255,255,.65)}
+    body.yt-ui .speed-opt:hover{background:rgba(255,255,255,.08);color:#fff}
+    body.yt-ui .stats-label{color:rgba(255,255,255,.35)}
+    body.yt-ui .stats-val{color:rgba(255,255,255,.85)}
+    body.yt-ui .stats-sep{background:rgba(255,255,255,.06)}
+    /* Zahnrad-Untermenü im Player (Größe, Stats, Tempo, Boost, Sleep) */
+    .yt-gear-panel{right:52px;min-width:215px;padding:10px}
+    .yt-gear-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);margin:2px 2px 7px}
+    .yt-gear-sizes{display:flex;gap:5px;margin-bottom:8px}
+    .yt-gear-sizes .size-btn{flex:1}
+    .yt-gear-list{display:flex;flex-direction:column;gap:5px}
+    .yt-gear-list>*{width:100%;height:30px;justify-content:center}
+    body.ui-locked .yt-gear-panel{display:none}
+    /* Auto-Hide über dem Video: offene Panels halten die Leiste sichtbar */
+    body.yt-ui .ctrl-bar.hide-fs:has(.stats-panel.open),
+    body.yt-ui .ctrl-bar.hide-fs:has(.speed-panel.open){opacity:1;pointer-events:auto;transform:none}
+
+    /* ══ 3 SEK. HALTEN = DATEI VON DER FESTPLATTE LÖSCHEN (added) ══ */
+    .pl-item{user-select:none}
+    .pl-item.hold-del{outline:1px solid rgba(230,57,70,.55)}
+    /* roter Füllbalken: startet erst nach 0,4s, damit normale Klicks nicht flackern */
+    .pl-item.hold-del::after{content:'';position:absolute;left:0;top:0;bottom:0;width:0;
+      background:rgba(230,57,70,.3);animation:holdDelFill 2.6s linear .4s forwards;pointer-events:none;z-index:2}
+    @keyframes holdDelFill{0%{width:0}100%{width:100%}}
+
+    /* ══ DESIGN-MODERNISIERUNG (added) — reine Optik, keine Funktionsänderung ══ */
+    /* Seitenbreite per ⚙-Slider: 100 % = voller Bildschirm, kleiner = mittig zentriert */
+    header,.main{width:100%;max-width:var(--page-w,100%);margin-left:auto;margin-right:auto}
+    body:not(.light){
+      background:
+        radial-gradient(1100px 520px at 85% -10%, rgba(230,57,70,.055), transparent 60%),
+        radial-gradient(900px 480px at -10% 110%, rgba(56,189,248,.045), transparent 60%),
+        var(--bg);
+    }
+    body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    ::selection{background:rgba(230,57,70,.45);color:#fff}
+    :focus-visible{outline:2px solid rgba(230,57,70,.55);outline-offset:2px}
+    header{background:rgba(17,17,24,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+    body.light header{background:rgba(250,250,254,.88)}
+    .logo em{text-shadow:0 0 16px rgba(230,57,70,.5)}
+    .pl-tab.active{background:linear-gradient(135deg,#e63946,#c1121f)}
+    .pl-tab.active{box-shadow:0 3px 14px rgba(230,57,70,.35)}
+    .add-hbtn{background:linear-gradient(135deg,#e63946,#d62839);box-shadow:0 2px 10px rgba(230,57,70,.3)}
+    .s-add-btn{background:linear-gradient(135deg,#e63946,#d62839)}
+    .pl-section{border-radius:13px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+    .src-row{border-radius:12px}
+    .mtab.active{box-shadow:0 2px 10px rgba(0,0,0,.35)}
+    .modal{border-radius:18px;box-shadow:0 40px 100px rgba(0,0,0,.7)}
+    .toast{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 14px 44px rgba(0,0,0,.5)}
+    .prog-fill{background:linear-gradient(90deg,#d62839,#ff5a67)}
+    /* Scrollbalken: etwas griffiger, mit Hover-Effekt */
+    ::-webkit-scrollbar{width:7px;height:7px}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.13);border-radius:8px}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.26)}
+    body.light ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18)}
+    body.light ::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.32)}
   </style>
 </head>
 <body>
@@ -451,6 +665,7 @@
     </button>
   </div>
 
+
   <span id="hLabel" style="display:none"></span>
 
   <div class="h-right">
@@ -458,8 +673,11 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7.5 12 12 15 14"/></svg>
       <span id="timeSpent">0d 0h 0m</span>
     </div>
-    <button class="ico-btn" id="togglePlBtn" aria-label="Playlist-Leiste ein- oder ausblenden" title="Playlist-Leiste ein/ausblenden">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+    <button class="ico-btn" id="togglePlBtn" aria-label="Playlist-Leiste ein- oder ausblenden (21:9 Modus)" title="Playlist ein/ausblenden — 21:9 Modus">
+      <svg width="21" height="11" viewBox="0 0 23 11" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1" y="1" width="21" height="9" rx="1.5"/></svg>
+    </button>
+    <button class="ico-btn" id="settingsBtn" aria-label="Einstellungen öffnen" title="Einstellungen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
     <button class="ico-btn" id="themeBtn" aria-label="Hell- oder Dunkelmodus umschalten" title="Design umschalten">🌙</button>
     <button class="add-hbtn" id="addMainBtn">
@@ -486,15 +704,13 @@
       <!-- 15-sec skip zones (only visible in playlist mode) -->
       <div class="skip-zone left" id="skipBack">
         <div class="skip-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/><text x="9" y="16" font-size="7" fill="currentColor" stroke="none" font-weight="bold">15</text></svg>
-          
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="15.2" text-anchor="middle" font-size="6" font-weight="700" font-family="sans-serif" stroke="none">15</text></svg>
         </div>
         <div class="skip-flash" id="flashBack"><div class="skip-flash-inner"></div></div>
       </div>
       <div class="skip-zone right" id="skipFwd">
         <div class="skip-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-3.5"/><text x="9" y="16" font-size="7" fill="currentColor" stroke="none" font-weight="bold">15</text></svg>
-          
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" transform="translate(24,0) scale(-1,1)"/><text x="12" y="15.2" text-anchor="middle" font-size="6" font-weight="700" font-family="sans-serif" stroke="none">15</text></svg>
         </div>
         <div class="skip-flash" id="flashFwd"><div class="skip-flash-inner"></div></div>
       </div>
@@ -530,15 +746,17 @@
       </div>
       <!-- buttons row -->
       <div class="ctrl-top">
-        <!-- fullscreen FAR LEFT -->
-        <button class="size-btn" id="cfsBtn" title="Vollbild (F)">⛶</button>
+        <!-- fullscreen FAR LEFT — zwei Diagonal-Pfeile (11 Uhr + 5 Uhr) -->
+        <button class="size-btn" id="cfsBtn" title="Vollbild (F)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 3 3 3 3 9"/><line x1="3" y1="3" x2="10" y2="10"/><polyline points="15 21 21 21 21 15"/><line x1="21" y1="21" x2="14" y2="14"/></svg>
+        </button>
         <!-- size buttons LEFT -->
         <button class="size-btn active" id="size100" title="Volle Größe">100%</button>
         <button class="size-btn" id="size75"  title="75%">75%</button>
         <button class="size-btn" id="size50"  title="50%">50%</button>
         <button class="size-btn" id="size25"  title="25%">25%</button>
 
-        <div style="flex:1"></div>
+        <div class="ctrl-sp1" style="flex:1"></div>
 
         <!-- transport controls CENTER -->
         <button class="cbtn" id="crepeat" title="Wiederholen">
@@ -548,7 +766,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
         </button>
         <button class="cbtn" id="cskipback" title="−15 Sekunden">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/><text x="7.5" y="15.5" font-size="6.5" fill="currentColor" stroke="none" font-weight="700" font-family="sans-serif">15</text></svg>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="15.2" text-anchor="middle" font-size="6" font-weight="700" font-family="sans-serif" stroke="none">15</text></svg>
         </button>
         <!-- play/pause -->
         <button class="cbtn big" id="cplay">
@@ -556,7 +774,7 @@
           <svg id="icoPause" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
         </button>
         <button class="cbtn" id="cskipfwd" title="+15 Sekunden">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-3.51"/><text x="7.5" y="15.5" font-size="6.5" fill="currentColor" stroke="none" font-weight="700" font-family="sans-serif">15</text></svg>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" transform="translate(24,0) scale(-1,1)"/><text x="12" y="15.2" text-anchor="middle" font-size="6" font-weight="700" font-family="sans-serif" stroke="none">15</text></svg>
         </button>
         <button class="cbtn" id="cnext" title="Nächstes (→)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm8.5-6v6H17V6h-2.5v6z"/></svg>
@@ -565,7 +783,11 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
         </button>
 
-        <div style="flex:1"></div>
+        <div class="ctrl-sp2" style="flex:1"></div>
+
+        <!-- Qualitäts-Emblem + Frame-Status-LED (rechts, vor der Lautstärke) -->
+        <span class="qual-badge" id="qualBadge" style="display:none"></span>
+        <span class="drop-led" id="dropLed" style="display:none"></span>
 
         <!-- volume + auto RIGHT -->
         <div class="vol-row">
@@ -574,6 +796,8 @@
           </button>
           <input type="range" id="volSlider" min="0" max="1" step="0.01" value="1">
         </div>
+        <!-- YouTube-Modus: Zeit als „0:00 / 1:06:16" (tCur/tDur ziehen per JS hier rein) -->
+        <span class="yt-time" id="ytTimeBox"><span class="yt-time-sep">/</span></span>
         <div class="auto-row">
           <label class="tog"><input type="checkbox" id="autoToggle" checked><span class="tog-sl"></span></label>
           Auto
@@ -585,11 +809,22 @@
         <button class="speed-btn" id="speedBtn" title="Geschwindigkeit">1x</button>
         <button class="speed-btn" id="boostBtn" title="Lautstärke-Boost (bis 300%)">BOOST</button>
         <button class="speed-btn" id="sleepBtn" title="Sleep-Timer">🌙</button>
+        <!-- YouTube-Modus: Zahnrad-Untermenü für Größe/Stats/Tempo/Boost/Sleep -->
+        <button class="cbtn" id="ytGearBtn" title="Player-Optionen">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button class="speed-btn" id="holdBtn" title="Steuerung sperren — schützt vor versehentlichen Klicks. Entsperren: Knopf oder H-Taste 1 Sekunde gedrückt halten">🔓 HOLD</button>
         </div>
       <!-- speed panel -->
       <div class="speed-panel" id="speedPanel"></div>
       <!-- sleep panel (added) -->
       <div class="speed-panel sleep-panel" id="sleepPanel"></div>
+      <!-- YouTube-Modus: Zahnrad-Untermenü (Knöpfe ziehen per JS hier rein) -->
+      <div class="speed-panel yt-gear-panel" id="ytGearPanel">
+        <div class="yt-gear-title">Player-Optionen</div>
+        <div class="yt-gear-sizes" id="ytGearSizes"></div>
+        <div class="yt-gear-list" id="ytGearList"></div>
+      </div>
       <!-- stats overlay panel -->
       <div class="stats-panel" id="statsPanel">
         <div class="stats-title">
@@ -701,51 +936,141 @@
   </div>
 </div>
 
-<!-- ══ SHORTCUTS OVERLAY ══ -->
-<div class="shortcuts-overlay" id="shortcutsOverlay">
-  <div class="shortcuts-box">
-    <div class="shortcuts-title"><span>⌨</span> TASTENKÜRZEL<button class="shortcuts-close" id="shortcutsClose">✕</button></div>
-    <div class="sc-group">
-      <div class="sc-group-title">Wiedergabe</div>
-      <div class="sc-row"><span class="sc-desc">Play / Pause</span><div class="sc-keys"><span class="sc-key">Space</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Nächstes Video</span><div class="sc-keys"><span class="sc-key">→</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Vorheriges Video</span><div class="sc-keys"><span class="sc-key">←</span></div></div>
-      <div class="sc-row"><span class="sc-desc">+15 Sekunden</span><div class="sc-keys"><span class="sc-key">Shift</span><span class="sc-key">→</span></div></div>
-      <div class="sc-row"><span class="sc-desc">−15 Sekunden</span><div class="sc-keys"><span class="sc-key">Shift</span><span class="sc-key">←</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Lautstärke +2%</span><div class="sc-keys"><span class="sc-key">↑</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Lautstärke −2%</span><div class="sc-keys"><span class="sc-key">↓</span></div></div>
+<!-- ══ MODAL: Einstellungen + Tastenkürzel (⚙ / ?) ══ -->
+<div class="mbg" id="settingsModal">
+  <div class="modal settings-modal">
+    <div class="modal-title">⚙ <span>Einstellungen</span>&nbsp;&amp; Tastenkürzel<button class="mclose" onclick="closeModal('settingsModal')">✕</button></div>
+
+    <div class="settings-body">
+    <div class="set-col">
+    <div class="field">
+      <label>Titelgröße auf dem Video — <span id="vtSizeVal">21</span> px</label>
+      <div class="set-slider-row">
+        <input type="range" id="vtSizeSlider" min="12" max="48" step="1" value="21">
+        <button class="set-reset" id="vtSizeReset" title="Auf Standard (21 px) zurücksetzen">↺</button>
+      </div>
+      <div class="modal-hint">Beim Ziehen wird der Titel direkt auf dem Video eingeblendet — du siehst sofort, wie groß er wird.</div>
     </div>
-    <div class="sc-group">
-      <div class="sc-group-title">Geschwindigkeit</div>
-      <div class="sc-row"><span class="sc-desc">Schneller</span><div class="sc-keys"><span class="sc-key">Shift</span><span class="sc-key">↑</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Langsamer</span><div class="sc-keys"><span class="sc-key">Shift</span><span class="sc-key">↓</span></div></div>
+
+    <div class="field">
+      <label>Größe der 15-Sekunden-Knöpfe — <span id="skipSizeVal">48</span> px</label>
+      <div class="set-slider-row">
+        <input type="range" id="skipSizeSlider" min="28" max="96" step="2" value="48">
+        <button class="set-reset" id="skipSizeReset" title="Auf Standard (48 px) zurücksetzen">↺</button>
+      </div>
+      <div class="modal-hint">Vorschau erscheint links/rechts auf dem Video, solange du ziehst.</div>
     </div>
-    <div class="sc-group">
-      <div class="sc-group-title">Steuerung</div>
-      <div class="sc-row"><span class="sc-desc">Autoplay an/aus</span><div class="sc-keys"><span class="sc-key">A</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Wiederholen (Aus / Video / Playlist)</span><div class="sc-keys"><span class="sc-key">R</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Zufallsmodus an/aus</span><div class="sc-keys"><span class="sc-key">Z</span></div></div>
+
+    <div class="field">
+      <label>Seitenbreite — <span id="pageWVal">100</span> %</label>
+      <div class="set-slider-row">
+        <input type="range" id="pageWSlider" min="55" max="100" step="1" value="100">
+        <button class="set-reset" id="pageWReset" title="Auf 100 % (volle Breite) zurücksetzen">↺</button>
+      </div>
+      <div class="modal-hint">100 % = ganzer Bildschirm wird genutzt. Kleiner = Seite wird mittig schmaler.</div>
     </div>
-    <div class="sc-group">
-      <div class="sc-group-title">Ansicht</div>
-      <div class="sc-row"><span class="sc-desc">Vollbild</span><div class="sc-keys"><span class="sc-key">F</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Stummschalten</span><div class="sc-keys"><span class="sc-key">M</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Video-Größe durchschalten (100/75/50/25%)</span><div class="sc-keys"><span class="sc-key">V</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Statistiken anzeigen</span><div class="sc-keys"><span class="sc-key">S</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Playlist-Leiste ein/ausblenden</span><div class="sc-keys"><span class="sc-key">P</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Hell/Dunkel-Modus</span><div class="sc-keys"><span class="sc-key">D</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Aktuelles Video löschen (2× X bestätigen)</span><div class="sc-keys"><span class="sc-key">X</span><span class="sc-key">X</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Tastenkürzel anzeigen</span><div class="sc-keys"><span class="sc-key">?</span></div></div>
+
+    <div class="field">
+      <label>Playlist-Breite — <span id="plWVal">310</span> px</label>
+      <div class="set-slider-row">
+        <input type="range" id="plWSlider" min="220" max="460" step="10" value="310">
+        <button class="set-reset" id="plWReset" title="Auf Standard (310 px) zurücksetzen">↺</button>
+      </div>
+      <div class="modal-hint">Schmaler = mehr Platz fürs Video.</div>
     </div>
-    <div class="sc-group">
-      <div class="sc-group-title">Playlist-Navigation</div>
-      <div class="sc-row"><span class="sc-desc">Playlist auswählen (rauf/runter)</span><div class="sc-keys"><span class="sc-key">Alt</span><span class="sc-key">↑</span> / <span class="sc-key">Alt</span><span class="sc-key">↓</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Kategorie wechseln (links/rechts)</span><div class="sc-keys"><span class="sc-key">Alt</span><span class="sc-key">←</span> / <span class="sc-key">Alt</span><span class="sc-key">→</span></div></div>
-      <div class="sc-row"><span class="sc-desc">Auswahl abspielen</span><div class="sc-keys"><span class="sc-key">Enter</span></div></div>
+
+    <div class="field">
+      <label>Player-Design</label>
+      <div class="set-toggle-row">
+        <button class="set-side-btn active" id="designYt">🎬 Kino (transparent)</button>
+        <button class="set-side-btn" id="designClassic">Klassisch</button>
+      </div>
+      <div class="modal-hint">Kino-Stil: Die Leiste liegt durchsichtig über dem Video — volles 16:9-Bild. Größen, Stats, Tempo, Boost &amp; Sleep stecken im ⚙ rechts unten im Player.</div>
     </div>
-    <div class="sc-group">
-      <div class="sc-group-title">Live-Modus</div>
-      <div class="sc-row"><span class="sc-desc">Quelle 1–9 wählen</span><div class="sc-keys"><span class="sc-key">1</span>–<span class="sc-key">9</span></div></div>
+
+    <div class="field">
+      <label>Playlist-Seite</label>
+      <div class="set-toggle-row">
+        <button class="set-side-btn" id="plSideLeft">◀ Links</button>
+        <button class="set-side-btn active" id="plSideRight">Rechts ▶</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Qualitäts-Emblem</label>
+      <div class="set-toggle-row">
+        <label class="tog"><input type="checkbox" id="qualBadgeToggle" checked><span class="tog-sl"></span></label>
+        <span class="modal-hint" style="margin:0">Zeigt SD / HD / Full HD / 1440p / 4K + Seitenverhältnis des laufenden Videos (unten rechts vor der Lautstärke).</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Frame-Status-LED (Nerd-Funktion)</label>
+      <div class="set-toggle-row">
+        <label class="tog"><input type="checkbox" id="dropLedToggle"><span class="tog-sl"></span></label>
+        <span class="modal-hint" style="margin:0">Leuchtpunkt neben dem Qualitäts-Emblem: <b style="color:var(--green)">Grün</b> = alles gut, Gelb → Orange = Ruckler, <b style="color:var(--accent)">Rot</b> = zu viele Frames verloren.</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Menü-Knöpfe unten ein-/ausblenden</label>
+      <div class="menu-chips" id="menuChips"></div>
+      <div class="modal-hint">Grün = sichtbar · durchgestrichen = ausgeblendet. Wirkt sofort. Der Play-Knopf bleibt natürlich immer da.</div>
+    </div>
+    </div><!-- /set-col -->
+
+    <!-- ── Rechte Spalte: Tastenkürzel (bearbeitbar) ── -->
+    <div class="set-col" id="keysCol">
+      <div class="keys-col-title">⌨ TASTENKÜRZEL <span class="keys-col-hint">— ✏ anklicken zum Ändern</span></div>
+      <div class="sc-group">
+        <div class="sc-group-title">Wiedergabe</div>
+        <div class="sc-row"><span class="sc-desc">Play / Pause</span><div class="sc-keys"><span class="sc-key">Space</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Nächstes Video</span><div class="sc-keys"><span class="sc-key">→</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Vorheriges Video</span><div class="sc-keys"><span class="sc-key">←</span></div></div>
+        <div class="sc-row"><span class="sc-desc">+15 Sekunden</span><div class="sc-keys"><span class="sc-key">Shift</span><span class="sc-key">→</span></div></div>
+        <div class="sc-row"><span class="sc-desc">−15 Sekunden</span><div class="sc-keys"><span class="sc-key">Shift</span><span class="sc-key">←</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Lautstärke +2%</span><div class="sc-keys"><span class="sc-key">↑</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Lautstärke −2%</span><div class="sc-keys"><span class="sc-key">↓</span></div></div>
+      </div>
+      <div class="sc-group">
+        <div class="sc-group-title">Geschwindigkeit</div>
+        <div class="sc-row"><span class="sc-desc">Schneller</span><div class="sc-keys"><span class="sc-key">Shift</span><span class="sc-key">↑</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Langsamer</span><div class="sc-keys"><span class="sc-key">Shift</span><span class="sc-key">↓</span></div></div>
+      </div>
+      <div class="sc-group">
+        <div class="sc-group-title">Steuerung</div>
+        <div class="sc-row"><span class="sc-desc">Autoplay an/aus</span><div class="sc-keys"><span class="sc-key">A</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Wiederholen (Aus / Video / Playlist)</span><div class="sc-keys"><span class="sc-key">R</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Zufallsmodus an/aus</span><div class="sc-keys"><span class="sc-key">Z</span></div></div>
+        <div class="sc-row"><span class="sc-desc">HOLD: drücken = sperren · 1 Sek. halten = entsperren</span><div class="sc-keys"><span class="sc-key">H</span></div></div>
+      </div>
+      <div class="sc-group">
+        <div class="sc-group-title">Ansicht</div>
+        <div class="sc-row"><span class="sc-desc">Vollbild</span><div class="sc-keys"><span class="sc-key">F</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Stummschalten</span><div class="sc-keys"><span class="sc-key">M</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Video-Größe durchschalten (100/75/50/25%)</span><div class="sc-keys"><span class="sc-key">V</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Statistiken anzeigen</span><div class="sc-keys"><span class="sc-key">S</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Playlist-Leiste ein/ausblenden</span><div class="sc-keys"><span class="sc-key">P</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Playlist-Seite links/rechts tauschen</span><div class="sc-keys"><span class="sc-key">L</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Hell/Dunkel-Modus</span><div class="sc-keys"><span class="sc-key">D</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Aktuelles Video löschen (2× X bestätigen)</span><div class="sc-keys"><span class="sc-key">X</span><span class="sc-key">X</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Einstellungen &amp; Tastenkürzel öffnen</span><div class="sc-keys"><span class="sc-key">?</span></div></div>
+      </div>
+      <div class="sc-group">
+        <div class="sc-group-title">Playlist-Navigation</div>
+        <div class="sc-row"><span class="sc-desc">Playlist auswählen (rauf/runter)</span><div class="sc-keys"><span class="sc-key">Alt</span><span class="sc-key">↑</span> / <span class="sc-key">Alt</span><span class="sc-key">↓</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Kategorie wechseln (links/rechts)</span><div class="sc-keys"><span class="sc-key">Alt</span><span class="sc-key">←</span> / <span class="sc-key">Alt</span><span class="sc-key">→</span></div></div>
+        <div class="sc-row"><span class="sc-desc">Auswahl abspielen</span><div class="sc-keys"><span class="sc-key">Enter</span></div></div>
+      </div>
+      <div class="sc-group">
+        <div class="sc-group-title">Live-Modus</div>
+        <div class="sc-row"><span class="sc-desc">Quelle 1–9 wählen</span><div class="sc-keys"><span class="sc-key">1</span>–<span class="sc-key">9</span></div></div>
+      </div>
+    </div><!-- /keysCol -->
+    </div><!-- /settings-body -->
+
+    <div class="mfoot">
+      <button class="mok" onclick="closeModal('settingsModal')">Fertig</button>
     </div>
   </div>
 </div>
@@ -1701,6 +2026,27 @@ function renderPlaylists() {
         if (curItemId === item.id) clearPlPlayer();
         plSave(); renderPlaylists();
       });
+      // ── 3 Sekunden gedrückt halten → Datei ENDGÜLTIG von der Festplatte löschen ──
+      if (item.type === 'local') {
+        let holdDelT = null;
+        const cancelHoldDel = () => { if (holdDelT) { clearTimeout(holdDelT); holdDelT = null; } div.classList.remove('hold-del'); };
+        div.addEventListener('pointerdown', e => {
+          if (e.button !== 0) return; // nur linke Maustaste / Touch
+          if (e.target.closest('.pl-idel') || e.target.closest('.pl-item-drag')) return;
+          cancelHoldDel();
+          div.classList.add('hold-del');
+          holdDelT = setTimeout(() => {
+            holdDelT = null;
+            div.classList.remove('hold-del');
+            _swallowNextPlClick = true; // der Klick beim Loslassen darf kein Video starten
+            deleteFromDisk(pl.id, item.id);
+          }, 3000);
+        });
+        div.addEventListener('pointerup', cancelHoldDel);
+        div.addEventListener('pointerleave', cancelHoldDel);
+        div.addEventListener('pointercancel', cancelHoldDel);
+        div.addEventListener('dragstart', cancelHoldDel, true);
+      }
       items.appendChild(div);
     });
 
@@ -1864,12 +2210,13 @@ function setupVideoEvents() {
     document.getElementById('progFill').style.width = pct;
     document.getElementById('progThumb').style.left = pct;
     document.getElementById('tCur').textContent = fmt(vid.currentTime);
+    renderDur();
     _resumeTick++;
     if (_resumeTick % 25 === 0 && curItemId && vid.currentTime > 5) {
       resumeSave(curItemId, vid.currentTime, vid.duration);
     }
   });
-  vid.addEventListener('loadedmetadata', () => { document.getElementById('tDur').textContent = fmt(vid.duration); });
+  vid.addEventListener('loadedmetadata', renderDur);
   vid.addEventListener('play',  () => { updatePlayBtn(true);  document.getElementById('audioOverlay').classList.remove('paused'); });
   vid.addEventListener('pause', () => {
     updatePlayBtn(false);
@@ -2070,12 +2417,12 @@ document.addEventListener('keydown', e => {
   if (document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'||document.activeElement.tagName==='SELECT') return;
   if (e.key==='Escape') {
     document.querySelectorAll('.mbg.open').forEach(m=>m.classList.remove('open'));
-    document.getElementById('shortcutsOverlay').classList.remove('open');
     return;
   }
   if (e.key==='?' || (e.key==='/' && e.shiftKey)) {
     e.preventDefault();
-    document.getElementById('shortcutsOverlay').classList.toggle('open');
+    // Tastenkürzel wohnen jetzt im Einstellungs-Modal
+    if (typeof window._toggleSettings === 'function') window._toggleSettings();
     return;
   }
   if (e.key==='m' || e.key==='M') {
@@ -2137,7 +2484,41 @@ document.querySelectorAll('.mbg').forEach(bg => bg.addEventListener('click', e =
 /* ══ HELPERS ══ */
 function uid()    { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function fmt(s)   { if (!isFinite(s)) return '0:00'; const m=Math.floor(s/60),sec=Math.floor(s%60); return `${m}:${String(sec).padStart(2,'0')}`; }
+function fmt(s)   {
+  if (!isFinite(s)) return '0:00';
+  s = Math.max(0, Math.floor(s));
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  // Ab 1 Stunde: h:mm:ss statt reiner Minutenzählung (77:26 → 1:17:26, 12h-Video → 12:00:00)
+  return h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`
+    : `${m}:${String(sec).padStart(2,'0')}`;
+}
+// Gesamtdauer unten rechts — je nach Einstellung als Restzeit (runterzählend)
+function renderDur() {
+  const el = document.getElementById('tDur');
+  if (!el) return;
+  if (!vid.duration || !isFinite(vid.duration)) { el.textContent = '0:00'; return; }
+  const remaining = window._settings && window._settings.durRemaining;
+  el.textContent = remaining ? '−' + fmt(vid.duration - vid.currentTime) : fmt(vid.duration);
+}
+// Qualitätsstufe: Breite ODER Höhe zählt — 2560×1280 (21:9-Content) ist damit 1440p, nicht Full HD
+function qualTier(w, h) {
+  if (w >= 3840 || h >= 2160) return ['4K', 'q-4k'];
+  if (w >= 2560 || h >= 1440) return ['1440p', 'q-qhd'];
+  if (w >= 1920 || h >= 1080) return ['Full HD', 'q-fhd'];
+  if (w >= 1280 || h >= 720)  return ['HD', 'q-hd'];
+  return ['SD', 'q-sd'];
+}
+// Seitenverhältnis benennen (16:9, 21:9, 4:3, 2:1 …) — sonst gerundet als x:1
+function aspectName(w, h) {
+  if (!w || !h) return '';
+  const r = w / h;
+  const KNOWN = [['16:9',16/9],['21:9',21/9],['4:3',4/3],['16:10',1.6],['2:1',2],['3:2',1.5],['1:1',1],['9:16',9/16]];
+  let best = '', bd = Infinity;
+  for (const [n, v] of KNOWN) { const d = Math.abs(r - v) / v; if (d < bd) { bd = d; best = n; } }
+  if (bd <= 0.03) return best;
+  return (Math.round(r * 100) / 100) + ':1';
+}
 function cleanName(f) { return f.replace(/\.[^.]+$/,'').replace(/[_\-\.]+/g,' ').trim(); }
 function urlName(u) { try { return decodeURIComponent(u.split('/').pop().split('?')[0])||'Video'; } catch { return 'Video'; } }
 function hexA(hex,a) { if(!hex||hex.length<7) return `rgba(230,57,70,${a})`; const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; }
@@ -2444,6 +2825,68 @@ document.getElementById('relinkInput').addEventListener('change', e => {
 });
 
 
+/* ══ VIDEO ENDGÜLTIG VON DER FESTPLATTE LÖSCHEN (added) ══ */
+/*   3 Sekunden auf ein Playlist-Video drücken → Datei wird über die
+     Ordner-Verknüpfung (File System Access API) WIRKLICH gelöscht.
+     Chrome fragt einmalig nach Schreib-Erlaubnis für den Ordner.
+     ⚠ Endgültig — die Datei landet NICHT im Papierkorb!            */
+let _swallowNextPlClick = false;
+document.addEventListener('click', e => {
+  // Klick beim Loslassen nach erfolgreichem Lösch-Halten schlucken,
+  // sonst startet er versehentlich das nächste Video in der Liste
+  if (_swallowNextPlClick) {
+    _swallowNextPlClick = false;
+    if (e.target.closest('.pl-item')) { e.stopPropagation(); e.preventDefault(); }
+  }
+}, true);
+
+async function deleteFromDisk(plId, itemId) {
+  const pl = getPlaylist(plId); if (!pl) return;
+  const item = pl.items.find(i => i.id === itemId); if (!item) return;
+  if (item.type !== 'local') { toast('⚠ Nur lokale Dateien können gelöscht werden', 'err'); return; }
+
+  const handle = await _dirDB.get(plId);
+  if (!handle) { toast('⚠ Kein Ordner verknüpft — einmal „↺ Dateien" klicken', 'err'); return; }
+
+  // Schreib-Erlaubnis holen (Chrome zeigt einmalig einen Bestätigungs-Dialog)
+  let perm = 'denied';
+  try {
+    perm = await handle.queryPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') perm = await handle.requestPermission({ mode: 'readwrite' });
+  } catch(e) {}
+  if (perm !== 'granted') { toast('⚠ Schreib-Erlaubnis nicht erteilt — nichts gelöscht', 'err'); return; }
+
+  // Echten Dateinamen ermitteln: erst aus fileMeta, sonst im Ordner nach Namen suchen
+  let fname = fileMeta[itemId] && fileMeta[itemId].name;
+  if (!fname) {
+    const targetNorm = normName(item.name);
+    try {
+      for await (const [name, h] of handle.entries()) {
+        if (h.kind === 'file' && normName(name) === targetNorm) { fname = name; break; }
+      }
+    } catch(e) {}
+  }
+  if (!fname) { toast('⚠ Datei im Ordner nicht gefunden', 'err'); return; }
+
+  // Läuft das Video gerade? Erst stoppen und freigeben, sonst blockiert die Datei
+  if (curItemId === itemId) clearPlPlayer();
+  if (objURLs[itemId]) { URL.revokeObjectURL(objURLs[itemId]); delete objURLs[itemId]; }
+
+  try {
+    await handle.removeEntry(fname);
+  } catch(err) {
+    toast('⚠ Löschen fehlgeschlagen (' + (err && err.name === 'NotFoundError' ? 'Datei nicht gefunden' : 'Datei evtl. gerade in Benutzung') + ')', 'err');
+    return;
+  }
+
+  plIgnoreAdd(pl, item); // Ordner-Scan soll den Namen nicht wieder anlegen wollen
+  resumeClear(itemId); thumbClear(itemId);
+  pl.items = pl.items.filter(x => x.id !== itemId);
+  plSave(); renderPlaylists();
+  const nm = item.name.length > 34 ? item.name.slice(0, 31) + '…' : item.name;
+  toast('🗑 „' + nm + '" endgültig von der Festplatte gelöscht', 'ok');
+}
+
 function plSave() {
   // Save all playlists — local file items lose their blob src (can't persist File objects)
   // but keep name, type, id so the list structure survives reload
@@ -2560,16 +3003,11 @@ function toast(msg,type='') {
     // MIME type
     if (meta && meta.mime) rows.push(['MIME', meta.mime]);
 
-    // Resolution
+    // Resolution — Breite ODER Höhe zählt (2560×1280 → 1440p, nicht Full HD)
     if (!isAudio && v.videoWidth > 0) {
       const w = v.videoWidth, h = v.videoHeight;
-      let label = w + ' × ' + h;
-      if (h >= 2160) label += '  (4K)';
-      else if (h >= 1440) label += '  (2K)';
-      else if (h >= 1080) label += '  (Full HD)';
-      else if (h >= 720) label += '  (HD)';
-      else if (h >= 480) label += '  (SD)';
-      rows.push(['Auflösung', label]);
+      rows.push(['Auflösung', w + ' × ' + h + '  (' + qualTier(w, h)[0] + ')']);
+      rows.push(['Seitenverhältnis', aspectName(w, h)]);
     }
 
     // Duration
@@ -2648,6 +3086,8 @@ function toast(msg,type='') {
 
   let hideTimer = null;
   let isFs = false;
+  // Im YouTube-Design liegt die Leiste immer über dem Video → gleiches Auto-Hide wie im Vollbild
+  const overlayMode = () => isFs || document.body.classList.contains('yt-ui');
 
   // YouTube-Style Hover-Titel
   function showVideoTitle() {
@@ -2669,14 +3109,15 @@ function toast(msg,type='') {
     if (mode === 'live') { cp.classList.remove('visible'); titleBar.classList.remove('show'); return; }
     cp.classList.add('visible');
     showVideoTitle();
-    if (isFs) ctrlBar.classList.remove('hide-fs');
+    if (overlayMode()) ctrlBar.classList.remove('hide-fs');
     clearTimeout(hideTimer);
     hideTimer = setTimeout(hideUI, 500);
   }
 
   function hideUI() {
+    if (window._holdPending) return; // HOLD wird gerade gedrückt gehalten → Leiste nicht wegziehen
     if (!v.paused) cp.classList.remove('visible');
-    if (isFs && !v.paused) ctrlBar.classList.add('hide-fs');
+    if (overlayMode() && !v.paused) ctrlBar.classList.add('hide-fs');
     hideVideoTitle();
   }
 
@@ -2686,7 +3127,7 @@ function toast(msg,type='') {
     clearTimeout(hideTimer);
     if (!v.paused || mode === 'live') {
       cp.classList.remove('visible');
-      if (isFs) ctrlBar.classList.add('hide-fs');
+      if (overlayMode()) ctrlBar.classList.add('hide-fs');
     }
     hideVideoTitle();
   });
@@ -2864,12 +3305,6 @@ function toast(msg,type='') {
   });
 })();
 
-/* ══ TASTENKÜRZEL-OVERLAY ══ */
-(function() {
-  const overlay = document.getElementById('shortcutsOverlay');
-  document.getElementById('shortcutsClose').addEventListener('click', () => overlay.classList.remove('open'));
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-})();
 /* ══ SIDEBAR TOGGLE (added) ══ */
 (function() {
   const KEY = 'andex_pl_collapsed';
@@ -3054,7 +3489,9 @@ function toast(msg,type='') {
      S → Stats-Panel an/aus
      V → Video-Größe durchschalten (100% → 75% → 50% → 25% → 100%)
      R → Repeat durchschalten (Aus → Dieses Video → Playlist → Aus)
-     Z → Shuffle/Zufallsmodus an/aus                                      */
+     Z → Shuffle/Zufallsmodus an/aus
+     H → Steuerung sperren (HOLD) — entsperren nur per 1 Sek. halten
+     L → Playlist-Seite links/rechts tauschen                             */
 (function() {
   function isTyping() {
     const a = document.activeElement;
@@ -3105,6 +3542,18 @@ function toast(msg,type='') {
     if (btn) btn.click(); // bestehende Logik kümmert sich um Toast
   }
 
+  function lockHold() {
+    const hb = document.getElementById('holdBtn');
+    if (!hb) return;
+    if (hb.style.display === 'none') { showToast('⚠ HOLD ist in den Einstellungen ausgeblendet', 'err'); return; }
+    // Nur SPERREN — entsperren geht bewusst nur per 1 Sek. gedrückt halten
+    if (!document.body.classList.contains('ui-locked')) hb.click();
+  }
+
+  function switchPlSide() {
+    if (typeof window._togglePlSide === 'function') window._togglePlSide();
+  }
+
   document.addEventListener('keydown', e => {
     if (isTyping() || modalOpen()) return;
     if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) return;
@@ -3114,6 +3563,8 @@ function toast(msg,type='') {
     else if (k === 'v') { e.preventDefault(); cycleSize(); }
     else if (k === 'r') { e.preventDefault(); toggleRepeat(); }
     else if (k === 'z') { e.preventDefault(); toggleShuffle(); }
+    else if (k === 'h') { e.preventDefault(); lockHold(); }
+    else if (k === 'l') { e.preventDefault(); switchPlSide(); }
   });
 })();
 /* ══ TOAST IM VOLLBILD SICHTBAR + LAUTSTÄRKE ↑/↓ (added) ══ */
@@ -3351,6 +3802,8 @@ function toast(msg,type='') {
     togglePlaylist:   'p',
     toggleTheme:      'd',
     deleteVideo:      'x',
+    holdLock:         'h',
+    plSide:           'l',
   };
   const ROW_MATCH = {
     playPause:        ['Space'],
@@ -3365,6 +3818,8 @@ function toast(msg,type='') {
     togglePlaylist:   ['P'],
     toggleTheme:      ['D'],
     deleteVideo:      ['X', 'X'],
+    holdLock:         ['H'],
+    plSide:           ['L'],
   };
   const STORAGE_KEY = 'andex_keybindings';
   const REMAP_FLAG  = '__andexRemapDone';
@@ -3399,6 +3854,8 @@ function toast(msg,type='') {
 
   let bindings = loadBindings();
   let editingActive = false;
+  // aktuelle Belegung nach außen geben (z.B. für „HOLD-Taste halten = entsperren")
+  window._boundKey = a => (bindings && bindings[a]) || DEFAULT_BINDINGS[a] || '';
 
   document.addEventListener('keydown', e => {
     try {
@@ -3453,7 +3910,8 @@ function toast(msg,type='') {
   }
 
   function initOverlay() {
-    const overlay = document.getElementById('shortcutsOverlay');
+    // Die Tastenkürzel-Liste lebt jetzt im Einstellungs-Modal (rechte Spalte)
+    const overlay = document.getElementById('settingsModal');
     if (!overlay) return;
 
     const css = document.createElement('style');
@@ -3469,7 +3927,7 @@ function toast(msg,type='') {
       '.sc-reset-btn:hover{background:var(--surface3);color:var(--accent);border-color:var(--accent)}';
     document.head.appendChild(css);
 
-    const box = overlay.querySelector('.shortcuts-box') || overlay;
+    const box = overlay.querySelector('#keysCol') || overlay;
     const firstGroup = box.querySelector('.sc-group');
     if (firstGroup) {
       const bar = document.createElement('div');
@@ -3779,10 +4237,509 @@ function toast(msg,type='') {
   function fmt(s){
     const d = Math.floor(s/86400), h = Math.floor((s%86400)/3600),
           m = Math.floor((s%3600)/60);
-    return d+'d '+h+'h '+m+'m';
+    if (d > 0) return d+'d '+h+'h '+m+'m';
+    if (h > 0) return h+'h '+m+'m';
+    return m+' min';
   }
   el.textContent = fmt(s);
   setInterval(() => { s++; localStorage.setItem(KEY, s); el.textContent = fmt(s); }, 1000);
+})();
+
+/* ══ EINSTELLUNGEN (⚙ Zahnrad im Header) (added) ══ */
+(function(){
+  const KEY = 'andex_settings';
+  const DEF = {
+    vtSize: 21, skipSize: 48, plLeft: false, qualBadge: true, durRemaining: false, dropLed: false,
+    ytUi: true, // YouTube-Design als Standard, „Klassisch" als Fallback
+    pageW: 100, plWidth: 310,
+    menu: { fs:true, sizes:true, repeat:true, prev:true, back15:true, fwd15:true, next:true, shuffle:true,
+            volume:true, auto:true, stats:true, speed:true, boost:true, sleep:true, hold:true }
+  };
+  let s = { ...DEF, menu: { ...DEF.menu } };
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+    Object.assign(s, saved);
+    s.menu = Object.assign({}, DEF.menu, (saved && saved.menu) || {});
+  } catch(e) {}
+  window._settings = s;
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e) {} };
+
+  /* — Menü-Knöpfe: alles außer Play lässt sich ausblenden — */
+  const MENU_ITEMS = [
+    ['fs',      'Vollbild',        ['cfsBtn']],
+    ['sizes',   'Größen 100–25%',  ['size100','size75','size50','size25']],
+    ['repeat',  'Wiederholen',     ['crepeat']],
+    ['prev',    'Vorheriges',      ['cprev']],
+    ['back15',  '−15 Sek',         ['cskipback']],
+    ['fwd15',   '+15 Sek',         ['cskipfwd']],
+    ['next',    'Nächstes',        ['cnext']],
+    ['shuffle', 'Zufall',          ['cshuffle']],
+    ['volume',  'Lautstärke',      [], '.vol-row'],
+    ['auto',    'Autoplay',        [], '.auto-row'],
+    ['stats',   'Stats',           ['statsBtn']],
+    ['speed',   'Tempo (1x)',      ['speedBtn']],
+    ['boost',   'BOOST',           ['boostBtn']],
+    ['sleep',   'Sleep-Timer',     ['sleepBtn']],
+    ['hold',    'HOLD',            ['holdBtn']],
+  ];
+  // Diese Punkte stecken im YouTube-Design im ⚙-Untermenü und sind dort IMMER sichtbar
+  // (sonst wäre das Panel leer, wenn man sie für die klassische Leiste ausgeblendet hat)
+  const GEAR_KEYS = ['sizes', 'stats', 'speed', 'boost', 'sleep'];
+  function applyMenu(){
+    const yt = document.body.classList.contains('yt-ui');
+    MENU_ITEMS.forEach(([key, label, ids, sel]) => {
+      let show = s.menu[key] !== false;
+      if (yt && GEAR_KEYS.includes(key)) show = true;
+      const els = sel ? [...document.querySelectorAll(sel)] : ids.map(id => document.getElementById(id)).filter(Boolean);
+      els.forEach(el => { el.style.display = show ? '' : 'none'; });
+      // HOLD ausblenden, während gesperrt ist? Dann vorher entsperren — sonst kommt man nie wieder rein
+      if (key === 'hold' && !show && document.body.classList.contains('ui-locked') && typeof window._holdUnlock === 'function') {
+        window._holdUnlock();
+      }
+    });
+  }
+
+  function apply(){
+    document.documentElement.style.setProperty('--vt-size', s.vtSize + 'px');
+    document.documentElement.style.setProperty('--skip-ico', s.skipSize + 'px');
+    document.documentElement.style.setProperty('--page-w', (s.pageW || 100) + '%');
+    document.documentElement.style.setProperty('--pw', (s.plWidth || 310) + 'px');
+    document.body.classList.toggle('pl-left', !!s.plLeft);
+    if (typeof window._applyPlayerDesign === 'function') window._applyPlayerDesign(s.ytUi !== false);
+    applyMenu();
+    if (typeof window._updateQualBadge === 'function') window._updateQualBadge();
+    if (typeof window._updateDropLed === 'function') window._updateDropLed();
+  }
+  apply();
+  // fürs Design-Modul: nach dem Umbau einmal komplett neu anwenden (richtige Reihenfolge beim Laden)
+  window._settingsApply = apply;
+
+  const vtSlider = document.getElementById('vtSizeSlider');
+  const vtVal    = document.getElementById('vtSizeVal');
+  const skSlider = document.getElementById('skipSizeSlider');
+  const skVal    = document.getElementById('skipSizeVal');
+  const sideL    = document.getElementById('plSideLeft');
+  const sideR    = document.getElementById('plSideRight');
+  const qbToggle = document.getElementById('qualBadgeToggle');
+  const dlToggle = document.getElementById('dropLedToggle');
+  const chipWrap = document.getElementById('menuChips');
+
+  function buildChips(){
+    chipWrap.innerHTML = '';
+    const yt = s.ytUi !== false;
+    MENU_ITEMS.forEach(([key, label]) => {
+      const c = document.createElement('button');
+      c.type = 'button';
+      const on = s.menu[key] !== false;
+      const inGear = yt && GEAR_KEYS.includes(key);
+      c.className = 'menu-chip ' + (on ? 'on' : 'off');
+      c.textContent = inGear ? label + ' ⚙' : label;
+      c.title = inGear
+        ? 'Steckt im Kino-Design immer sichtbar im ⚙-Menü — dieser Schalter gilt nur für die klassische Leiste'
+        : (on ? 'Klick: „' + label + '" ausblenden' : 'Klick: „' + label + '" wieder einblenden');
+      c.addEventListener('click', () => {
+        s.menu[key] = !(s.menu[key] !== false);
+        save(); applyMenu(); buildChips();
+      });
+      chipWrap.appendChild(c);
+    });
+  }
+
+  function syncUI(){
+    vtSlider.value = s.vtSize;   vtVal.textContent = s.vtSize;
+    skSlider.value = s.skipSize; skVal.textContent = s.skipSize;
+    document.getElementById('pageWSlider').value = s.pageW || 100;
+    document.getElementById('pageWVal').textContent = s.pageW || 100;
+    document.getElementById('plWSlider').value = s.plWidth || 310;
+    document.getElementById('plWVal').textContent = s.plWidth || 310;
+    sideL.classList.toggle('active', !!s.plLeft);
+    sideR.classList.toggle('active', !s.plLeft);
+    document.getElementById('designYt').classList.toggle('active', s.ytUi !== false);
+    document.getElementById('designClassic').classList.toggle('active', s.ytUi === false);
+    qbToggle.checked = s.qualBadge !== false;
+    dlToggle.checked = !!s.dropLed;
+    buildChips();
+  }
+
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    syncUI();
+    openModal('settingsModal');
+  });
+
+  /* — Titelgröße: Live-Vorschau direkt auf dem Video — */
+  const titleBar  = document.getElementById('videoTitleBar');
+  const titleText = document.getElementById('videoTitleText');
+  let vtPrevTimer = null, vtSample = false;
+  function previewTitle(){
+    if (!titleText.textContent.trim()) {
+      titleText.textContent = 'So groß wird der Video-Titel angezeigt';
+      vtSample = true;
+    }
+    titleBar.classList.add('show');
+    clearTimeout(vtPrevTimer);
+    vtPrevTimer = setTimeout(() => {
+      titleBar.classList.remove('show');
+      if (vtSample) { titleText.textContent = ''; vtSample = false; }
+    }, 1600);
+  }
+  vtSlider.addEventListener('input', () => {
+    s.vtSize = parseInt(vtSlider.value) || DEF.vtSize;
+    vtVal.textContent = s.vtSize;
+    document.documentElement.style.setProperty('--vt-size', s.vtSize + 'px');
+    previewTitle(); save();
+  });
+  document.getElementById('vtSizeReset').addEventListener('click', () => {
+    s.vtSize = DEF.vtSize; save(); apply(); syncUI(); previewTitle();
+  });
+
+  /* — Skip-Button-Größe: Zonen als Vorschau einblenden — */
+  let skPrevTimer = null;
+  function previewSkip(){
+    document.body.classList.add('skip-preview');
+    clearTimeout(skPrevTimer);
+    skPrevTimer = setTimeout(() => document.body.classList.remove('skip-preview'), 1600);
+  }
+  skSlider.addEventListener('input', () => {
+    s.skipSize = parseInt(skSlider.value) || DEF.skipSize;
+    skVal.textContent = s.skipSize;
+    document.documentElement.style.setProperty('--skip-ico', s.skipSize + 'px');
+    previewSkip(); save();
+  });
+  document.getElementById('skipSizeReset').addEventListener('click', () => {
+    s.skipSize = DEF.skipSize; save(); apply(); syncUI(); previewSkip();
+  });
+
+  /* — Seitenbreite (100 % = ganzer Bildschirm) — */
+  const pageWSlider = document.getElementById('pageWSlider');
+  pageWSlider.addEventListener('input', () => {
+    s.pageW = parseInt(pageWSlider.value) || DEF.pageW;
+    document.getElementById('pageWVal').textContent = s.pageW;
+    document.documentElement.style.setProperty('--page-w', s.pageW + '%');
+    save();
+  });
+  document.getElementById('pageWReset').addEventListener('click', () => {
+    s.pageW = DEF.pageW; save(); apply(); syncUI();
+  });
+
+  /* — Playlist-Breite — */
+  const plWSlider = document.getElementById('plWSlider');
+  plWSlider.addEventListener('input', () => {
+    s.plWidth = parseInt(plWSlider.value) || DEF.plWidth;
+    document.getElementById('plWVal').textContent = s.plWidth;
+    document.documentElement.style.setProperty('--pw', s.plWidth + 'px');
+    save();
+  });
+  document.getElementById('plWReset').addEventListener('click', () => {
+    s.plWidth = DEF.plWidth; save(); apply(); syncUI();
+  });
+
+  /* — Player-Design: YouTube (transparent) ↔ Klassisch — */
+  document.getElementById('designYt').addEventListener('click', () => {
+    s.ytUi = true; save(); apply(); syncUI(); toast('🎬 Kino-Design aktiv', 'ok');
+  });
+  document.getElementById('designClassic').addEventListener('click', () => {
+    s.ytUi = false; save(); apply(); syncUI(); toast('🎛 Klassisches Design aktiv', 'ok');
+  });
+
+  /* — Playlist-Seite tauschen — */
+  sideL.addEventListener('click', () => { s.plLeft = true;  save(); apply(); syncUI(); toast('📋 Playlist jetzt links', 'ok'); });
+  sideR.addEventListener('click', () => { s.plLeft = false; save(); apply(); syncUI(); toast('📋 Playlist jetzt rechts', 'ok'); });
+
+  /* — für Tastenkürzel: L = Seite tauschen, ? = Modal auf/zu — */
+  window._togglePlSide = () => {
+    s.plLeft = !s.plLeft; save(); apply(); syncUI();
+    toast(s.plLeft ? '📋 Playlist jetzt links' : '📋 Playlist jetzt rechts', 'ok');
+  };
+  window._toggleSettings = () => {
+    const m = document.getElementById('settingsModal');
+    if (m.classList.contains('open')) closeModal('settingsModal');
+    else { syncUI(); openModal('settingsModal'); }
+  };
+
+  /* — Qualitäts-Emblem an/aus — */
+  qbToggle.addEventListener('change', () => { s.qualBadge = qbToggle.checked; save(); apply(); });
+
+  /* — Frame-Status-LED an/aus (Nerd-Funktion, standardmäßig aus) — */
+  dlToggle.addEventListener('change', () => {
+    s.dropLed = dlToggle.checked; save(); apply();
+    toast(s.dropLed ? '💡 Frame-Status-LED an' : '💡 Frame-Status-LED aus', 'ok');
+  });
+
+  /* — Klick auf die Zeit unten rechts: Gesamtdauer ↔ Restzeit (runterzählend) — */
+  const tDurEl = document.getElementById('tDur');
+  tDurEl.title = 'Klick: Gesamtdauer ↔ Restzeit';
+  tDurEl.addEventListener('click', () => {
+    s.durRemaining = !s.durRemaining; save();
+    renderDur();
+    toast(s.durRemaining ? '⏳ Zeigt Restzeit (zählt runter)' : '🕐 Zeigt Gesamtdauer', 'ok');
+  });
+})();
+
+/* ══ QUALITÄTS-EMBLEM unten links (added) ══ */
+(function(){
+  const b = document.getElementById('qualBadge');
+  const v = document.getElementById('localVid');
+  if (!b || !v) return;
+  function update(){
+    const enabled = !window._settings || window._settings.qualBadge !== false;
+    if (!enabled || !v.classList.contains('show') || !v.videoWidth || !v.videoHeight) {
+      b.style.display = 'none'; return;
+    }
+    const w = v.videoWidth, h = v.videoHeight;
+    const t = qualTier(w, h);
+    b.textContent = t[0] + ' · ' + aspectName(w, h);
+    b.title = 'Auflösung: ' + w + ' × ' + h;
+    b.className = 'qual-badge ' + t[1];
+    b.style.display = '';
+  }
+  window._updateQualBadge = update;
+  v.addEventListener('loadedmetadata', update);
+  v.addEventListener('emptied', () => { b.style.display = 'none'; });
+  // reagiert auf Ein-/Ausblenden des Videos (Moduswechsel, Audio-Overlay)
+  new MutationObserver(update).observe(v, { attributes: true, attributeFilter: ['class'] });
+})();
+
+/* ══ FRAME-STATUS-LED (added) ══ */
+/*   Nerd-Funktion, standardmäßig AUS (⚙ → Frame-Status-LED).
+     Misst alle 2 Sekunden die frisch verlorenen Frames (nicht die Gesamtsumme,
+     damit ein alter Ruckler die Anzeige nicht ewig rot färbt):
+     Grün < 0,5 % · Gelb < 2 % · Orange < 5 % · Rot darüber.                  */
+(function(){
+  const led = document.getElementById('dropLed');
+  const v   = document.getElementById('localVid');
+  if (!led || !v) return;
+  let lastTotal = 0, lastDropped = 0;
+  const STUFEN = [
+    [0.5,      '#2ecc71', 'alles gut'],
+    [2,        '#fbbf24', 'leichte Ruckler'],
+    [5,        '#ff6b35', 'deutliche Ruckler'],
+    [Infinity, '#e63946', 'viele Frames gehen verloren!'],
+  ];
+  function tick(){
+    const enabled = window._settings && window._settings.dropLed;
+    if (!enabled || !v.classList.contains('show') || !v.getVideoPlaybackQuality) {
+      led.style.display = 'none';
+      return;
+    }
+    const q = v.getVideoPlaybackQuality();
+    if (!q.totalVideoFrames) { led.style.display = 'none'; return; }
+    const dT = q.totalVideoFrames - lastTotal;
+    const dD = Math.max(0, q.droppedVideoFrames - lastDropped);
+    lastTotal = q.totalVideoFrames; lastDropped = q.droppedVideoFrames;
+    const pct = dT > 0 ? (dD / dT) * 100 : 0;
+    const st = STUFEN.find(x => pct < x[0]);
+    led.style.display = '';
+    led.style.background = st[1];
+    led.style.boxShadow = '0 0 9px ' + st[1];
+    led.title = 'Frame-Status: ' + st[2] + ' — gerade ' + pct.toFixed(1) + ' % verloren · gesamt '
+      + q.droppedVideoFrames.toLocaleString('de-DE') + ' von ' + q.totalVideoFrames.toLocaleString('de-DE') + ' Frames';
+  }
+  window._updateDropLed = tick;
+  setInterval(tick, 2000);
+})();
+
+/* ══ HOLD — STEUERUNG SPERREN (added) ══ */
+/*   Wie der Hold-Schalter am Walkman: sperrt alle Player-Knöpfe, Skip-Zonen,
+     die Fortschrittsleiste und die Tastenkürzel. Entsperren nur durch
+     1 Sekunde gedrückt halten — ein versehentlicher Klick reicht nicht. */
+(function(){
+  const btn = document.getElementById('holdBtn');
+  if (!btn) return;
+  let locked = false, holdTimer = null, justUnlocked = false, lastHint = 0;
+
+  function hint(){
+    const now = Date.now();
+    if (now - lastHint < 2000) return;
+    lastHint = now;
+    toast('🔒 Gesperrt — HOLD-Knopf oder H-Taste 1 Sek. gedrückt halten', 'err');
+  }
+  function setLocked(v){
+    locked = v;
+    document.body.classList.toggle('ui-locked', v);
+    btn.classList.toggle('locked', v);
+    btn.textContent = v ? '🔒 HOLD' : '🔓 HOLD';
+  }
+  // Für die Einstellungen: wird HOLD ausgeblendet während gesperrt ist, vorher entsperren
+  window._holdUnlock = () => setLocked(false);
+
+  btn.addEventListener('click', () => {
+    if (justUnlocked) { justUnlocked = false; return; }
+    if (!locked) {
+      setLocked(true);
+      toast('🔒 Steuerung gesperrt — Knopf oder H-Taste 1 Sek. halten zum Entsperren');
+    } else {
+      hint();
+    }
+  });
+  btn.addEventListener('pointerdown', () => {
+    if (!locked) return;
+    btn.textContent = '⏳ halten…';
+    // Verhindert, dass die Vollbild-Leiste sich WÄHREND des Haltens ausblendet
+    // (sonst verschwindet der Knopf unter der Maus → pointerleave → Abbruch)
+    window._holdPending = true;
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(() => {
+      justUnlocked = true;
+      window._holdPending = false;
+      setLocked(false);
+      toast('🔓 Steuerung entsperrt', 'ok');
+      // Flag kurz danach zurücksetzen, falls der Klick nach dem Loslassen ausbleibt
+      setTimeout(() => { justUnlocked = false; }, 500);
+    }, 1000);
+  });
+  const cancelHold = () => {
+    clearTimeout(holdTimer);
+    window._holdPending = false;
+    if (locked) btn.textContent = '🔒 HOLD';
+  };
+  btn.addEventListener('pointerup', cancelHold);
+  btn.addEventListener('pointerleave', cancelHold);
+
+  /* — H-Taste (bzw. umbelegte HOLD-Taste) 1 Sek. gedrückt halten = entsperren — */
+  let keyHoldTimer = null, keyHoldActive = false;
+  function holdKeyName(){
+    const k = (typeof window._boundKey === 'function' && window._boundKey('holdLock')) || 'h';
+    return String(k).toLowerCase();
+  }
+
+  // Tastenkürzel blockieren — auf window in der Capture-Phase, läuft damit VOR allen anderen Handlern
+  window.addEventListener('keydown', e => {
+    if (!locked) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return; // Browser-Kürzel (Strg+R etc.) nicht anfassen
+    const a = document.activeElement;
+    if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable)) return;
+    const k = e.key;
+    // HOLD-Taste gedrückt halten → entsperren (e.repeat ignoriert den Tastendruck,
+    // der gerade erst gesperrt hat — man muss frisch drücken und halten)
+    if (k.toLowerCase() === holdKeyName()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (!keyHoldActive && !e.repeat) {
+        keyHoldActive = true;
+        btn.textContent = '⏳ halten…';
+        keyHoldTimer = setTimeout(() => {
+          keyHoldActive = false;
+          setLocked(false);
+          toast('🔓 Steuerung entsperrt', 'ok');
+        }, 1000);
+      }
+      return;
+    }
+    if (k.length === 1 || k.startsWith('Arrow') || k === 'Enter') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      hint();
+    }
+  }, true);
+  window.addEventListener('keyup', e => {
+    if (!keyHoldActive) return;
+    if (e.key.toLowerCase() !== holdKeyName()) return;
+    keyHoldActive = false;
+    clearTimeout(keyHoldTimer);
+    if (locked) { btn.textContent = '🔒 HOLD'; hint(); }
+  }, true);
+
+  // Klick auf gesperrte Bereiche → kurzer Hinweis statt stiller Funkstille
+  const pcol = document.querySelector('.player-col');
+  if (pcol) pcol.addEventListener('click', e => {
+    if (!locked) return;
+    if (e.target.closest('#holdBtn')) return;
+    hint();
+  });
+})();
+
+/* ══ VIDEO-TITEL PER KLICK KOPIEREN (added) ══ */
+(function(){
+  const t = document.getElementById('videoTitleText');
+  if (!t) return;
+  t.title = 'Klick: Titel kopieren';
+  t.addEventListener('click', e => {
+    const txt = t.textContent.trim();
+    if (!txt) return;
+    e.stopPropagation();
+    const done = () => toast('📋 Titel kopiert: „' + (txt.length > 40 ? txt.slice(0, 37) + '…' : txt) + '"', 'ok');
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch(err) { toast('⚠ Kopieren nicht möglich', 'err'); }
+      ta.remove();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done).catch(fallback);
+    } else fallback();
+  });
+})();
+
+/* ══ YOUTUBE-STYLE PLAYER-DESIGN (added) ══ */
+/*   Schiebt im YouTube-Modus die Zeit in die Knopfzeile („0:00 / 1:06:16")
+     und Größen/Stats/Tempo/Boost/Sleep ins ⚙-Untermenü im Player.
+     „Klassisch" stellt alles 1:1 an die alten Plätze zurück —
+     die Knöpfe (und ihre Funktionen) bleiben exakt dieselben.          */
+(function(){
+  const tCur      = document.getElementById('tCur');
+  const tDur      = document.getElementById('tDur');
+  const timeBox   = document.getElementById('ytTimeBox');
+  const sep       = timeBox ? timeBox.querySelector('.yt-time-sep') : null;
+  const progWrap  = document.querySelector('.prog-wrap');
+  const progTrack = document.getElementById('progTrack');
+  const gearBtn   = document.getElementById('ytGearBtn');
+  const gearPanel = document.getElementById('ytGearPanel');
+  const gearSizes = document.getElementById('ytGearSizes');
+  const gearList  = document.getElementById('ytGearList');
+  const cfs       = document.getElementById('cfsBtn');
+  const holdB     = document.getElementById('holdBtn');
+  const sizes     = ['size100','size75','size50','size25'].map(id => document.getElementById(id));
+  const tools     = ['statsBtn','speedBtn','boostBtn','sleepBtn'].map(id => document.getElementById(id));
+  if (!timeBox || !gearPanel) return;
+
+  function applyDesign(yt){
+    document.body.classList.toggle('yt-ui', !!yt);
+    if (yt) {
+      timeBox.insertBefore(tCur, sep);
+      timeBox.appendChild(tDur);
+      sizes.forEach(b => gearSizes.appendChild(b));
+      tools.forEach(b => gearList.appendChild(b));
+    } else {
+      progWrap.insertBefore(tCur, progTrack);
+      progWrap.appendChild(tDur);
+      cfs.after(sizes[0], sizes[1], sizes[2], sizes[3]);
+      tools.forEach(b => holdB.before(b));
+      gearPanel.classList.remove('open');
+    }
+  }
+  window._applyPlayerDesign = applyDesign;
+
+  // ⚙ im Player öffnet/schließt das Untermenü, andere Panels gehen dabei zu
+  gearBtn.addEventListener('click', () => {
+    const open = gearPanel.classList.toggle('open');
+    if (open) {
+      document.getElementById('speedPanel').classList.remove('open');
+      document.getElementById('sleepPanel').classList.remove('open');
+      document.getElementById('statsPanel').classList.remove('open');
+      document.getElementById('statsBtn').classList.remove('active');
+    }
+  });
+  document.addEventListener('click', e => {
+    if (!gearPanel.contains(e.target) && !gearBtn.contains(e.target)) gearPanel.classList.remove('open');
+  });
+
+  // Stats / Tempo / Sleep öffnen eigene Panels → Zahnrad-Menü dabei schließen,
+  // sonst liegen die Menüs übereinander und nichts ist auswählbar.
+  // (BOOST bleibt offen — der schaltet nur durch und öffnet kein Panel.)
+  ['statsBtn', 'speedBtn', 'sleepBtn'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.addEventListener('click', () => {
+      if (document.body.classList.contains('yt-ui')) gearPanel.classList.remove('open');
+    });
+  });
+
+  // Start-Design aus den Einstellungen anwenden — über die Settings-Logik,
+  // damit applyMenu() danach mit gesetztem yt-ui-Modus läuft (⚙-Punkte sichtbar)
+  if (typeof window._settingsApply === 'function') window._settingsApply();
+  else applyDesign(!window._settings || window._settings.ytUi !== false);
 })();
 </script>
 </body>
